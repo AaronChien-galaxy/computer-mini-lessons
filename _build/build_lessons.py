@@ -1,7 +1,9 @@
 import os,re,json
 base=os.path.dirname(os.path.abspath(__file__))
 OUT_ROOT='D:/AI/Dev/computer-mini-lessons'
-src=open(os.path.join(base,'browser','slides.html'),encoding='utf-8').read()
+_css_src=os.path.join(base,'browser','slides.html')
+if not os.path.exists(_css_src): _css_src=os.path.join(OUT_ROOT,'browser-basics','index.html')
+src=open(_css_src,encoding='utf-8').read()
 CSS=src[src.index('<style>')+7:src.index('</style>')]
 
 EXTRA_CSS=r'''
@@ -33,7 +35,8 @@ EXTRA_CSS=r'''
 .flist{font-size:var(--t-caption);color:var(--muted);min-height:2em}
 .rlist{display:flex;flex-direction:column;gap:8px;width:100%}
 .res{display:block;text-align:left;border:4px solid var(--line);background:#fff;border-radius:16px;padding:.35em .8em;font-size:var(--t-caption);font-weight:800;color:var(--ink)}
-.res small{display:block;color:#2B7A3E;font-size:.85em}
+.res small{display:inline-block;margin-left:.6em;color:#2B7A3E;font-size:.85em}
+.slide>*{flex-shrink:0}
 .res .ad{background:var(--accent);color:#fff;border-radius:6px;padding:0 .4em;margin-right:.4em;font-size:.85em}
 .res.ok{border-color:var(--good);background:var(--good-soft)}
 .res.no{border-color:var(--accent);background:var(--accent-soft)}
@@ -44,7 +47,7 @@ EXTRA_CSS=r'''
 .sndrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:var(--t-body);font-weight:800;justify-content:center}
 .sndicon{font-size:calc(var(--t-body)*2)}
 input[type=range]{width:min(320px,60vw);height:2em;accent-color:var(--primary)}
-@media (max-height:780px){.desk{min-height:150px}.popwrap{min-height:140px}}
+@media (max-height:780px){.desk{min-height:150px}.popwrap{min-height:140px}.slide[data-type=stepper] .switch button{padding:.3em 1.2em}}
 '''
 
 CORE_JS=r'''
@@ -142,7 +145,7 @@ CORE_JS=r'''
           else if(v.indexOf('@')<0)render('帳號少了 @。按住 Shift 再按 2。');
           else render('帳號有地方打錯了，對照看看。右下角是不是英文？');
         }else{
-          if(v==='cat123'){mark(sec,'pass');mark(sec,'in');state='in';var sec2=t0?Math.round((Date.now()-t0)/1000):0;render('用了 '+sec2+' 秒。看到右上角的頭像了嗎？');say('登入成功')}
+          if(v==='cat123'){mark(sec,'pass');mark(sec,'in');state='in';var sec2=t0?Math.round((Date.now()-t0)/1000):0;render('用了 '+sec2+' 秒。用完要登出：點下面的頭像。');say('登入成功')}
           else render('密碼不對。點「顯示密碼」看看打了什麼。');
         }
       });
@@ -202,6 +205,7 @@ CORE_JS=r'''
         if(r.ok)mark(sec,'pick');
       });list.appendChild(b);
     });
+    var rs=sec.querySelector('.simreset');if(rs)rs.addEventListener('click',function(){unmark(sec);list.querySelectorAll('.res').forEach(function(b){b.classList.remove('ok','no')});exp.innerHTML='<span>哪一個最可靠？點點看。</span>'});
   };
   /* ---- save ---- */
   SIMS.save=function(sec){
@@ -304,7 +308,7 @@ def page_html(n,pg,total):
         cols='repeat(2,1fr)' if len(pg['cards'])<=4 else 'repeat(3,1fr)'
         body=k+'  <h2>%s</h2>\n  <div class="three" style="grid-template-columns:%s;width:min(1000px,100%%)">%s</div>\n  <p class="caption">點一張卡，看它的重點</p>\n'%(pg['title'],cols,cards)
     elif t=='sim':
-        chips=''.join('<span class="cs" data-t="%s">%s</span>'%(a,b) for a,b in pg['tasks'])
+        chips=''.join('<span class="cs" data-t="%s">%s</span>'%(a,b) for a,b in pg['tasks'])+'<button type="button" class="mini simreset">重來 ↺</button>'
         body=k+'  <h2>%s</h2>\n  <div class="chips">%s</div>\n%s\n  <div class="static-only qstatic"><p>%s</p></div>\n'%(pg['title'],chips,pg['html'],pg['static'])
     return head+body+'</section>\n'
 

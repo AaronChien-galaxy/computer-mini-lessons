@@ -5,13 +5,10 @@
 - browser-basics/：瀏覽器小達人 8 頁（11/9 用）
 - 首頁 index.html：課程選單（目前只列兩課）
 
-## 進行中：一次做完剩下 6 課（Aaron 說先全做完，每週上課前再討論細節修改）
-`_build/build_lessons.py` 已寫好（通用元件＋6 個模擬器 SIMS：login / windows / search / save / popup / sound），
-它在最後 exec 同資料夾的 `lessons_content.py`，**這個檔還沒寫**——要定義 `LESSONS` 清單，每課一個 dict：
-`slug, title, purpose, takeaway, pages[]`；頁型別 cover / hotspot / quiz / stepper / sim / reveal，欄位見 build_lessons.py 的 page_html()。
-sim 頁要給 `sim`（SIMS 名稱）、`tasks`（[(key,label)]，key 對應 JS 的 mark 鍵）、`html`（模擬器骨架）、`static`。
-search 課要在課的 dict 加 `results`（[{t,u,ad,ok,e}]）。build_lessons.py 的 CSS 取自 scratchpad 的 browser/slides.html（需先跑 build_browser.py，或改成讀 browser-basics/index.html）。
-輸出到 scratchpad\lessons\<slug>\index.html + spec.yaml；驗證用 skill soil-html-deck 的 verify_html.py（--strict-offline）；通過後複製到本倉庫 <slug>/index.html，更新首頁選單，commit。
+## 第二批 6 課（11/1 完成，已 commit，未 push）
+login-basics 7 頁、window-switching 6 頁、search-skills 6 頁、save-files 6 頁、web-safety 6 頁、first-aid 6 頁；首頁選單已列 8 課。
+內容在 `_build/lessons_content.py`，通用元件／模擬器在 `build_lessons.py`。改內容流程：改 lessons_content.py → 把兩個 .py 複製到 scratchpad 跑 `python build_lessons.py`（CSS 自動讀 browser-basics/index.html，輸出在 scratchpad\lessons\）→ verify_html --strict-offline → 複製 index.html 回倉庫 → commit。
+細節修改：Aaron 每週上課前再討論。
 
 ### 6 課內容規劃
 | slug | 課名 | 日期 | 頁面 |
