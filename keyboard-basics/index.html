@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>電腦小知識：中英文切換與功能鍵</title>
+<style>
+:root{
+  --bg:#FFF8EC; --card:#FFFFFF; --ink:#1E2A33; --muted:#52606B;
+  --primary:#1F6F8B; --primary-soft:#DCEEF4; --accent:#F28C38; --accent-soft:#FDE6D0;
+  --good:#3E9B5F; --good-soft:#DDF1E3; --line:#E7DCC8;
+  --font:"jf open 粉圓 2.1","GenSenRounded TW","GenJyuuGothic","Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+  /* locked type roles */
+  --t-cover:clamp(2.6rem,8vw,6rem);
+  --t-page:clamp(2rem,5vw,3.8rem);
+  --t-kicker:clamp(1.1rem,2.2vw,1.6rem);
+  --t-body:clamp(1.3rem,2.8vw,2.1rem);
+  --t-caption:clamp(1rem,1.8vw,1.35rem);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);overflow:hidden;font-weight:700}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:4px solid var(--accent);outline-offset:3px}
+
+/* shell */
+#progress{position:fixed;top:0;left:0;height:8px;width:0;background:var(--accent);transition:width .42s ease;z-index:20}
+#section-tag{position:fixed;top:14px;left:20px;z-index:20;font-size:var(--t-kicker);font-weight:800;color:var(--primary);background:var(--primary-soft);padding:.2em .9em;border-radius:999px}
+#page-info{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:20;font-size:var(--t-caption);color:var(--muted)}
+.navbtn{position:fixed;bottom:10px;z-index:20;border:0;border-radius:999px;padding:.5em 1.4em;font-size:var(--t-caption);font-weight:800;background:var(--primary);color:#fff}
+#prev{left:20px}#next{right:20px}
+.navbtn[disabled]{opacity:.3;cursor:default}
+#deck{position:fixed;inset:0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:52px clamp(16px,6vw,80px) 80px;gap:clamp(8px,1.8vh,22px);text-align:center;overflow-y:auto}
+.slide.active{display:flex;animation:pop .42s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+h1{font-size:var(--t-cover);line-height:1.15;font-weight:900}
+h2{font-size:var(--t-page);line-height:1.2;font-weight:900}
+.kicker{font-size:var(--t-kicker);color:var(--primary);font-weight:800;letter-spacing:.08em}
+p,.body{font-size:var(--t-body);line-height:1.5}
+.caption{font-size:var(--t-caption);color:var(--muted);font-weight:700}
+
+/* cover */
+.cover{background:linear-gradient(135deg,#1F6F8B 0%,#2B8AA8 60%,#F28C38 160%);color:#fff}
+.cover .kicker,.cover .caption{color:#FFF1DE}
+.cover .motif{display:flex;gap:14px;margin-top:10px}
+.cap{display:inline-flex;align-items:center;justify-content:center;min-width:2.2em;height:2.2em;padding:0 .6em;border-radius:.45em;
+  background:#fff;color:var(--ink);font-size:var(--t-body);font-weight:900;box-shadow:0 .18em 0 #C9D6DC,0 .3em .6em rgba(0,0,0,.18)}
+.cover .cap.hot{background:var(--accent);color:#fff;box-shadow:0 .18em 0 #C26A1E,0 .3em .6em rgba(0,0,0,.18)}
+.startbtn{margin-top:14px;border:0;border-radius:999px;background:#fff;color:var(--primary);padding:.5em 1.6em;font-size:var(--t-body);font-weight:900}
+
+/* page 2: toggle compare */
+.stage{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,2vw,28px);width:min(1100px,100%)}
+.panel{background:var(--card);border:5px solid var(--line);border-radius:26px;padding:clamp(14px,2.4vh,26px);display:flex;flex-direction:column;gap:10px;align-items:center;transition:border-color .3s,background .3s,opacity .3s}
+.panel.on{border-color:var(--primary);background:var(--primary-soft)}
+.panel.off{opacity:.55}
+.tray{display:inline-flex;align-items:center;gap:.6em;background:#2B3640;color:#fff;border-radius:12px;padding:.3em .9em;font-size:var(--t-body)}
+.tray b{display:inline-flex;width:1.5em;height:1.5em;align-items:center;justify-content:center;border-radius:.3em;background:var(--accent);font-weight:900}
+.typed{font-size:calc(var(--t-body)*1.25);font-weight:900;letter-spacing:.12em;min-height:1.3em}
+.result-note{font-size:var(--t-caption);color:var(--muted)}
+.switch{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.switch button{border:0;border-radius:999px;padding:.55em 1.5em;font-size:var(--t-body);font-weight:900;background:var(--card);border:4px solid var(--primary);color:var(--primary)}
+.switch button[aria-pressed="true"]{background:var(--primary);color:#fff}
+.tip{background:var(--accent-soft);border-left:10px solid var(--accent);border-radius:16px;padding:.6em 1em;font-size:var(--t-body);text-align:left;width:min(1100px,100%)}
+.static-only{display:none}
+.nojs .static-only{display:block}
+
+/* page 3: hotspot keyboard */
+.kb{display:flex;flex-direction:column;gap:clamp(5px,1vh,10px);width:min(1000px,100%);background:#E9E2D3;border-radius:22px;padding:clamp(8px,1.6vh,18px)}
+.row{display:flex;gap:clamp(4px,.8vw,9px);justify-content:center}
+.k{flex:0 0 auto;min-width:clamp(30px,5.4vw,64px);height:clamp(38px,7vh,64px);display:flex;align-items:center;justify-content:center;
+  border:0;border-radius:10px;background:#fff;box-shadow:0 4px 0 #C9C0AE;font-size:var(--t-caption);font-weight:900;color:var(--ink)}
+.k.fn{background:var(--primary-soft);box-shadow:0 4px 0 #A9CBD8;color:var(--primary)}
+.k.w2{min-width:clamp(60px,9vw,110px)}.k.w3{min-width:clamp(80px,12vw,150px)}.k.sp{min-width:clamp(160px,34vw,400px)}
+.k.hit{background:var(--accent);color:#fff;box-shadow:0 1px 0 #C26A1E;transform:translateY(3px)}
+.k.fn.hit{background:var(--accent);color:#fff}
+.explain{background:var(--card);border:5px solid var(--line);border-radius:22px;padding:.7em 1em;width:min(1000px,100%);min-height:5.2em;font-size:var(--t-body);display:flex;align-items:center;justify-content:center;text-align:left;gap:.6em}
+.explain .name{font-weight:900;color:var(--accent);white-space:nowrap}
+.scratch{width:min(1000px,100%);min-height:1.8em;background:var(--card);border:4px dashed var(--line);border-radius:16px;padding:.2em .8em;font-size:calc(var(--t-body)*1.1);text-align:left;word-break:break-all}
+.scratch .cursor{display:inline-block;width:.08em;height:1em;background:var(--ink);vertical-align:-.12em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+
+/* quiz */
+.quizbox{background:var(--card);border:5px solid var(--line);border-radius:26px;padding:clamp(14px,2.4vh,26px);width:min(900px,100%);display:flex;flex-direction:column;gap:12px}
+.qtext{font-size:var(--t-body);font-weight:900}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{border:4px solid var(--primary);background:var(--card);color:var(--primary);border-radius:18px;padding:.55em 1em;font-size:var(--t-body);font-weight:800;text-align:left}
+.opt.ok{background:var(--good);border-color:var(--good);color:#fff}
+.opt.no{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.feedback{min-height:2.6em;font-size:var(--t-body);text-align:left;color:var(--ink)}
+.qctl{display:flex;justify-content:space-between;align-items:center}
+.mini{border:0;border-radius:999px;background:var(--primary);color:#fff;padding:.4em 1.2em;font-size:var(--t-caption);font-weight:800}
+.mini[disabled]{opacity:.3}
+.scratchctl{width:min(1000px,100%);text-align:right}
+.qstatic{text-align:left;width:min(900px,100%)}
+.qstatic p{font-size:var(--t-caption)}
+.js .qstatic{display:none}
+/* stepper */
+.steps{list-style:none;width:min(900px,100%);display:flex;flex-direction:column;gap:10px}
+.step{display:flex;gap:14px;align-items:center;text-align:left;background:var(--card);border:5px solid var(--line);border-radius:22px;padding:.5em .9em;font-size:var(--t-body);transition:opacity .3s,border-color .3s}
+.step .num{flex:0 0 auto;width:1.8em;height:1.8em;border-radius:50%;background:var(--line);color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:900}
+.js .step.dim{opacity:.35}
+.step.now{border-color:var(--primary);background:var(--primary-soft)}
+.step.now .num{background:var(--primary);color:#fff}
+.linkbtn{border:0;text-decoration:none;background:var(--accent);color:#fff;display:inline-block;border-radius:999px;padding:.55em 1.5em;font-size:var(--t-body);font-weight:900}
+/* reveal */
+.three{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(10px,2vw,24px);width:min(1000px,100%)}
+.card3{background:var(--card);border:5px solid var(--line);border-radius:26px;padding:clamp(14px,2.4vh,26px);display:flex;flex-direction:column;gap:10px;text-align:center;align-items:center}
+.card3[aria-expanded="true"]{border-color:var(--primary);background:var(--primary-soft)}
+.card3 .ct{font-size:var(--t-body);font-weight:900;color:var(--primary)}
+.card3 .detail{font-size:var(--t-caption);line-height:1.5;color:var(--ink);display:none}
+.card3[aria-expanded="true"] .detail,.nojs .card3 .detail{display:block}
+@media (max-width:900px){.three{grid-template-columns:1fr}}
+@media (max-height:780px){
+  .slide[data-interaction="quiz"] .kicker,.slide[data-interaction="stepper"] .kicker{display:none}
+  .opt{padding:.3em .8em}.feedback{min-height:1.8em}.quizbox{gap:8px}
+  .step{padding:.15em .8em}.steps{gap:5px}.slide[data-interaction="stepper"] h2{font-size:calc(var(--t-page)*.85)}
+}
+
+
+.rbtns{display:flex;gap:12px;flex-wrap:wrap}
+.rbtns .opt{flex:1 1 200px;text-align:center}
+.homerow{display:flex;gap:clamp(5px,1vw,12px);justify-content:center;width:min(1000px,100%)}
+.hk{flex:1 1 0;max-width:90px;height:clamp(46px,9vh,76px);display:flex;align-items:center;justify-content:center;position:relative;border-radius:12px;background:#fff;box-shadow:0 5px 0 #C9C0AE;font-size:var(--t-body);font-weight:900;transition:background .3s}
+.hk.bump::after{content:"";position:absolute;bottom:10px;width:1.2em;height:4px;border-radius:3px;background:#C9C0AE}
+.hk.f1{background:#F9C5C5}.hk.f2{background:#FFE29A}.hk.f3{background:#BFE5C8}.hk.f4{background:#BFD9F2}
+.hk.hl{background:var(--accent);color:#fff}
+@media (max-height:780px){
+  .slide[data-interaction="tabs"] .kicker{display:none}
+  .slide[data-interaction="quiz"][aria-label="鍵盤公約"] .kicker{display:none}
+}
+
+.numrow{display:flex;gap:clamp(4px,.8vw,10px);justify-content:center;width:min(1000px,100%)}
+.nk{flex:1 1 0;max-width:86px;height:clamp(54px,11vh,86px);border:0;border-radius:12px;background:#fff;box-shadow:0 5px 0 #C9C0AE;font-size:calc(var(--t-body)*1.1);font-weight:900;color:var(--ink);transition:background .25s}
+.numrow.sym .nk{background:var(--primary-soft);box-shadow:0 5px 0 #A9CBD8;color:var(--primary)}
+.nk.pick{background:var(--accent)!important;color:#fff!important}
+.combo-steps{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:min(1000px,100%)}
+.cs{background:var(--card);border:4px solid var(--line);border-radius:999px;padding:.15em .8em;font-size:var(--t-caption);font-weight:800;color:var(--muted)}
+.cs.done{background:var(--good-soft);border-color:var(--good);color:var(--ink)}
+.docbox{width:min(1000px,100%);min-height:2.6em;background:var(--card);border:5px solid var(--line);border-radius:22px;padding:.4em .8em;font-size:calc(var(--t-body)*1.15);text-align:left;word-break:break-all;cursor:text}
+.docbox:focus-visible{border-color:var(--primary)}
+.docword{border-radius:6px;padding:0 .1em}
+.docword.sel{background:#BFD9F2}
+.cursor2{display:inline-block;width:.08em;height:1em;background:var(--ink);vertical-align:-.12em;animation:blink 1s steps(1) infinite}
+.card-hint{background:var(--accent-soft);border-left:10px solid var(--accent);border-radius:16px;padding:.35em 1em;font-size:var(--t-body)}
+.fakeform{display:flex;flex-direction:column;gap:10px;width:min(700px,100%);background:var(--card);border:5px solid var(--line);border-radius:22px;padding:clamp(10px,2vh,20px)}
+.fakeform label{display:flex;gap:12px;align-items:center;font-size:var(--t-body);font-weight:800;text-align:left}
+.fakeform input{flex:1;min-width:0;font:inherit;font-weight:700;border:4px solid var(--line);border-radius:14px;padding:.2em .5em;background:#fff;color:var(--ink)}
+.fakeform input:focus{border-color:var(--primary);outline:none}
+@media (min-width:901px){.three{grid-template-columns:repeat(3,1fr)!important;width:min(1100px,100%)!important}}
+@media (max-height:780px){
+  .slide[data-interaction="toggle_compare"][aria-label="數字鍵上的符號"] .kicker,
+  .slide[aria-label="複製貼上復原"] .kicker,
+  .slide[aria-label="假登入練習"] .kicker{display:none}
+  .slide[aria-label="複製貼上復原"] .docbox{min-height:1.8em}
+  .card3{padding:10px}
+}
+#notes{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#1E2A33;color:#fff;font-size:var(--t-caption);padding:12px 20px 52px;display:none;text-align:left}
+#notes.show{display:block}
+#live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr}
+  .slide{justify-content:flex-start}
+  .kb .row:nth-child(1) .k:nth-child(n+11){display:none}
+}
+@media (max-width:600px){
+  .k{min-width:26px;font-size:.8rem;padding:0 2px}.k.w3{min-width:54px}.k.w2{min-width:46px}
+  .row{gap:3px}.kb{padding:8px 4px}
+}
+@media (max-height:780px){
+  .slide[data-interaction="hotspot"] .kicker{display:none}
+  .k{height:38px}.explain{min-height:3.4em;padding:.4em .8em}
+  .scratch{min-height:1.5em}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body class="nojs">
+<div id="progress"></div>
+<div id="section-tag"></div>
+<main id="deck">
+
+<!-- 1 封面 -->
+<section class="slide cover active" data-slide="1" data-section="引起動機" data-interaction="none" aria-label="封面">
+  <p class="kicker">電腦小知識</p>
+  <h1>打字怎麼<br>變成怪怪的字？</h1>
+  <div class="motif" aria-hidden="true"><span class="cap">a</span><span class="cap hot">Shift</span><span class="cap">A</span></div>
+  <p class="caption">今天學：中文和英文的開關，還有三個好用的鍵</p>
+  <button class="startbtn" type="button" data-go="2">開始 ▶</button>
+</section>
+
+<!-- 鍵盤公約：quiz（可以／不可以） -->
+<section class="slide" data-slide="2" data-section="引起動機" data-interaction="quiz" aria-label="鍵盤公約">
+  <p class="kicker">先學規矩，鍵盤才不會壞</p>
+  <h2>這樣可以嗎？</h2>
+  <div class="quizbox" id="rbox">
+    <p class="qtext" id="rtext"></p>
+    <div class="rbtns">
+      <button type="button" class="opt" id="rYes">○ 可以</button>
+      <button type="button" class="opt" id="rNo">✕ 不可以</button>
+    </div>
+    <div class="feedback" id="rfb" aria-live="polite"></div>
+    <div class="qctl"><span class="caption" id="rscore"></span><button type="button" class="mini" id="rnext">下一題 ▶</button></div>
+  </div>
+  <div class="static-only qstatic">
+    <p>○ 手洗乾淨再打字。</p>
+    <p>✕ 用力拍鍵盤：會壞，輕輕按就好。</p>
+    <p>✕ 邊吃東西邊打字：碎屑會掉進去。</p>
+    <p>✕ 一個鍵按著不放：字會一直跑出來。</p>
+  </div>
+</section>
+
+<!-- 2 中英文切換：toggle_compare -->
+<section class="slide" data-slide="3" data-section="維持注意" data-interaction="toggle_compare" aria-label="中英文切換">
+  <p class="kicker">先看右下角</p>
+  <h2>打 a b c，會出現什麼？</h2>
+  <div class="switch" role="group" aria-label="選擇輸入法模式">
+    <button type="button" id="mZh" aria-pressed="false">按「中」看看</button>
+    <button type="button" id="mEn" aria-pressed="false">按「A」看看</button>
+  </div>
+  <div class="stage">
+    <div class="panel" id="pZh">
+      <span class="tray">右下角 <b>中</b></span>
+      <div class="typed" aria-label="中文模式打 a b c 的結果">ㄇㄖㄏ</div>
+      <p class="result-note">注音符號，看不懂的字</p>
+    </div>
+    <div class="panel" id="pEn">
+      <span class="tray">右下角 <b>A</b></span>
+      <div class="typed" aria-label="英文模式打 a b c 的結果">abc</div>
+      <p class="result-note">英文字母，登入就要這個</p>
+    </div>
+  </div>
+  <div class="tip">怎麼換？<strong>按一下 Shift</strong>，右下角的「中」和「A」會輪流出現。</div>
+  <p class="caption static-only">不能互動時：左邊是中文模式（ㄇㄖㄏ），右邊是英文模式（abc）。</p>
+</section>
+
+<!-- 3 功能鍵：hotspot -->
+<!-- 3 Shift 與 Caps Lock：quiz -->
+<section class="slide" data-slide="4" data-section="維持注意" data-interaction="quiz" aria-label="大寫小測驗">
+  <p class="kicker">想打大寫字母</p>
+  <h2 id="qTitle">怎麼按才對？</h2>
+  <div class="quizbox" id="quizbox">
+    <p class="qtext" id="qtext"></p>
+    <div class="opts" id="opts"></div>
+    <div class="feedback" id="qfb" aria-live="polite"></div>
+    <div class="qctl"><span class="caption" id="qscore"></span><button type="button" class="mini" id="qnext">下一題 ▶</button></div>
+  </div>
+  <div class="static-only qstatic">
+    <p>1. 打一個大寫 A：按住 Shift 再按 a。</p>
+    <p>2. 一直打大寫：按 Caps Lock。</p>
+    <p>3. 回到小寫：再按一次 Caps Lock。</p>
+  </div>
+</section>
+
+<section class="slide" data-slide="5" data-section="維持注意" data-interaction="hotspot" aria-label="功能鍵按按看">
+  <p class="kicker">真的鍵盤也可以按</p>
+  <h2>按一個鍵，看它做什麼</h2>
+  <div class="scratch" id="scratch" aria-label="你打的字"><span id="typed"></span><span class="cursor"></span></div>
+  <div class="kb" id="kb" role="group" aria-label="螢幕鍵盤"></div>
+  <div class="scratchctl"><button type="button" class="mini" id="clearTxt">清除打的字</button></div>
+  <div class="explain" id="explain" aria-live="polite"><span>點鍵盤上的藍色鍵，或直接按真的鍵。</span></div>
+</section>
+
+<!-- 手指歸位：tabs -->
+<section class="slide" data-slide="6" data-section="維持注意" data-interaction="tabs" aria-label="手指歸位">
+  <p class="kicker">十根手指各管幾個鍵</p>
+  <h2>手指「回家」的位置</h2>
+  <div class="switch" role="tablist" aria-label="選擇看哪一邊">
+    <button type="button" class="ftab" data-f="L" aria-pressed="false">左手</button>
+    <button type="button" class="ftab" data-f="R" aria-pressed="false">右手</button>
+    <button type="button" class="ftab" data-f="H" aria-pressed="false">F 和 J 的小突起</button>
+  </div>
+  <div class="homerow" id="homerow" aria-label="中間那一排鍵">
+    <span class="hk" data-key="a">a</span><span class="hk" data-key="s">s</span><span class="hk" data-key="d">d</span>
+    <span class="hk bump" data-key="f">f</span><span class="hk" data-key="g">g</span><span class="hk" data-key="h">h</span>
+    <span class="hk bump" data-key="j">j</span><span class="hk" data-key="k">k</span><span class="hk" data-key="l">l</span><span class="hk" data-key=";">;</span>
+  </div>
+  <div class="explain" id="fexplain" aria-live="polite"><span>點上面的按鈕，看每根手指放哪裡。</span></div>
+  <div class="static-only qstatic">
+    <p>左手：小指 a、無名指 s、中指 d、食指 f。右手：食指 j、中指 k、無名指 l、小指 ;。F 和 J 有小突起，摸到就知道手指回家了。大拇指放空白鍵。</p>
+  </div>
+</section>
+
+<!-- 符號在數字鍵上面：toggle_compare -->
+<section class="slide" data-slide="7" data-section="維持注意" data-interaction="toggle_compare" aria-label="數字鍵上的符號">
+  <p class="kicker">數字鍵上面藏著符號</p>
+  <h2>按住 Shift，數字變符號</h2>
+  <div class="switch">
+    <button type="button" id="symBtn" aria-pressed="false">按住 Shift：看符號</button>
+  </div>
+  <div class="numrow" id="numrow" role="group" aria-label="數字鍵"></div>
+  <div class="explain" id="symexp" aria-live="polite"><span>點一個鍵，看它是什麼。真的按住 Shift 也可以。</span></div>
+  <div class="static-only qstatic"><p>Shift＋2 是 @（電子郵件用），Shift＋1 是 !，Shift＋3 是 #。</p></div>
+</section>
+
+<!-- 組合鍵：hotspot（複製貼上復原） -->
+<section class="slide" data-slide="8" data-section="維持注意" data-interaction="hotspot" aria-label="複製貼上復原">
+  <p class="kicker">兩個鍵一起按</p>
+  <h2>Ctrl 組合鍵：複製、貼上、復原</h2>
+  <div class="combo-steps" id="csteps">
+    <span class="cs" data-cs="sel">① 雙擊文字選起來</span>
+    <span class="cs" data-cs="copy">② Ctrl + C 複製</span>
+    <span class="cs" data-cs="blank">③ 點一下空白處</span>
+    <span class="cs" data-cs="paste">④ Ctrl + V 貼上</span>
+    <span class="cs" data-cs="undo">⑤ Ctrl + Z 復原</span>
+  </div>
+  <div class="docbox" id="docbox" tabindex="0" aria-label="練習文件"><span id="docword" class="docword"></span><span class="cursor2"></span></div>
+  <div class="switch">
+    <button type="button" class="mini" id="bCopy">複製 Ctrl+C</button>
+    <button type="button" class="mini" id="bPaste">貼上 Ctrl+V</button>
+    <button type="button" class="mini" id="bUndo">復原 Ctrl+Z</button>
+    <button type="button" class="mini" id="bReset">重來</button>
+  </div>
+  <div class="explain" id="cexp" aria-live="polite"><span>先雙擊上面的字，把它選起來。</span></div>
+  <div class="static-only qstatic"><p>Ctrl＋C 複製，Ctrl＋V 貼上，Ctrl＋Z 復原。先把字選起來才能複製。</p></div>
+</section>
+
+<!-- 假登入練習：quiz -->
+<section class="slide" data-slide="9" data-section="喚起行動" data-interaction="quiz" aria-label="假登入練習">
+  <p class="kicker">登入前的暖身（假帳號）</p>
+  <h2>用鍵盤完成登入</h2>
+  <div class="card-hint">帳號：<b>Amy05@sch</b>　密碼：<b>cat123</b></div>
+  <form class="fakeform" id="fform" autocomplete="off">
+    <label>帳號 <input type="text" id="fUser" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="帳號"></label>
+    <label>密碼 <input type="password" id="fPass" autocomplete="off" aria-label="密碼"></label>
+    <div class="switch">
+      <button type="button" class="mini" id="fShow" aria-pressed="false">顯示密碼</button>
+      <button type="submit" class="mini" id="fGo">登入（或按 Enter）</button>
+    </div>
+  </form>
+  <div class="explain" id="fres" aria-live="polite"><span>點帳號欄開始打。打完用 Tab 跳到密碼，再按 Enter。</span></div>
+  <div class="static-only qstatic"><p>帳號 Amy05@sch：A 要大寫（Shift＋a），@ 是 Shift＋2。打完帳號按 Tab 到密碼欄，打完密碼按 Enter 登入。</p></div>
+</section>
+
+<!-- 5 符號小站：stepper -->
+<section class="slide" data-slide="10" data-section="喚起行動" data-interaction="stepper" aria-label="符號小站怎麼玩">
+  <p class="kicker">接下來練習打字</p>
+  <h2>符號小站，四步驟</h2>
+  <ol class="steps" id="steps">
+    <li class="step"><span class="num">1</span><span class="stext">老師機投影，從 Classroom 的連結進入「Shift 符號練習小站」。</span></li>
+    <li class="step"><span class="num">2</span><span class="stext">輸入你的 5 碼號碼：班級 3 碼＋座號 2 碼，再按 Enter。</span></li>
+    <li class="step"><span class="num">3</span><span class="stext">從第一關開始，一關一關往下打，打錯了按倒退。</span></li>
+    <li class="step"><span class="num">4</span><span class="stext">打完一組會得到星星，你的成績會自動送給老師。</span></li>
+  </ol>
+  <div class="switch">
+    <button type="button" id="stPrev">◀ 上一步</button>
+    <button type="button" id="stNext">下一步 ▶</button>
+    <button type="button" class="linkbtn" id="openSite">打開符號小站 ↗</button>
+  </div>
+</section>
+
+<!-- 6 收尾：reveal -->
+<section class="slide" data-slide="11" data-section="喚起行動" data-interaction="reveal" aria-label="今天記住六件事">
+  <p class="kicker">收尾</p>
+  <h2>今天記住六件事</h2>
+  <div class="three">
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">① 中英文開關</span><span class="detail">右下角看「中」或「A」，按一下 Shift 切換。登入要用英文。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">② Shift 變大寫</span><span class="detail">按住 Shift 再按字母，只變一個。要一直大寫就按 Caps Lock。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">③ Enter 確定</span><span class="detail">打完帳號、密碼，按 Enter 才會送出。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">④ Ctrl 組合鍵</span><span class="detail">Ctrl＋C 複製、Ctrl＋V 貼上、Ctrl＋Z 復原。先選起來再複製。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">⑤ Tab 換欄位</span><span class="detail">登入時，打完帳號按 Tab 跳到密碼，不用拿滑鼠。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">⑥ 輕按、手指回家</span><span class="detail">鍵盤輕輕按，不拍不壓。打字前食指放 F 和 J，摸到小突起。</span></button>
+  </div>
+  <p class="caption">點一張卡，看它的重點</p>
+</section>
+
+</main>
+<button class="navbtn" id="prev" type="button">◀ 上一頁</button>
+<span id="page-info"></span>
+<button class="navbtn" id="next" type="button">下一頁 ▶</button>
+<div id="notes" role="note"></div>
+<div id="live" aria-live="polite"></div>
+
+<script>
+(function(){
+  document.body.classList.remove('nojs');document.body.classList.add('js');
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var total=slides.length, cur=0;
+  var phaseEl=document.getElementById('section-tag'), pageEl=document.getElementById('page-info');
+  var progEl=document.getElementById('progress'), liveEl=document.getElementById('live');
+  var prevB=document.getElementById('prev'), nextB=document.getElementById('next');
+  var notesEl=document.getElementById('notes');
+  var NOTES=[
+    '開場問：打 abc 卻出現怪字，有人遇過嗎？先在教室電腦確認單按 Shift 真的會切換中／英（不同機器設定不同）。',
+    '四個情境，全班舉手：○ 可以、✕ 不可以。以前教過，快速帶過，重點是學生自己說理由。',
+    '複習：右下角「中」／「A」，按一下 Shift 切換。讓學生說出什麼時候一定要英文（登入）。',
+    '複習：三題小測驗，答錯不批評，讓他們說理由再看正解。',
+    '複習：Shift、Caps Lock、Enter 三顆鍵，加上倒退和空白。學生可以直接按實體鍵。',
+    '複習：F 和 J 的小突起、食指回家。只要求食指，不要求標準指法。',
+    '加深一：數字鍵上面的符號。重點是 Shift＋2＝@，之後登入、電子郵件都會用。讓學生真的按住 Shift 看畫面變化。',
+    '加深二：Ctrl 組合鍵。步驟：雙擊選起來→Ctrl＋C→點空白處→Ctrl＋V→Ctrl＋Z。先讓學生看，再各自在記事本實機做一次。',
+    '加深三：假登入。帳號有大寫和 @，是今天所有東西的總驗收。打完帳號按 Tab 換密碼欄，再按 Enter。鼓勵看「用了幾秒」，只跟自己比。',
+    '學生不會打網址：老師機投影，學生從 Classroom 連結進入。上課前先實機試玩一次，並確認試算表有收到紀錄。',
+    '請學生說出六件事，再點卡片對答案。最後留時間讓學生繼續玩符號小站。'
+  ];
+
+  function say(t){liveEl.textContent=t}
+  function go(n,push){
+    n=Math.max(0,Math.min(total-1,n)); cur=n;
+    slides.forEach(function(s,i){s.classList.toggle('active',i===n)});
+    var s=slides[n];
+    phaseEl.textContent=s.getAttribute('data-section');
+    pageEl.textContent=(n+1)+' / '+total;
+    progEl.style.width=((n+1)/total*100)+'%';
+    prevB.disabled=n===0; nextB.disabled=n===total-1;
+    notesEl.textContent=NOTES[n]||'';
+    if(history.replaceState)history.replaceState(null,'','#'+(n+1));
+    say('第 '+(n+1)+' 頁，'+s.getAttribute('aria-label'));
+    s.scrollTop=0;
+    var h=s.querySelector('h1,h2'); if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true})}
+  }
+  prevB.addEventListener('click',function(){go(cur-1)});
+  nextB.addEventListener('click',function(){go(cur+1)});
+  document.querySelectorAll('[data-go]').forEach(function(b){
+    b.addEventListener('click',function(){go(+b.getAttribute('data-go')-1)});
+  });
+
+  /* page 2 toggle */
+  var mZh=document.getElementById('mZh'), mEn=document.getElementById('mEn');
+  var pZh=document.getElementById('pZh'), pEn=document.getElementById('pEn');
+  function setMode(m){
+    mZh.setAttribute('aria-pressed',m==='zh'); mEn.setAttribute('aria-pressed',m==='en');
+    pZh.className='panel '+(m==='zh'?'on':'off'); pEn.className='panel '+(m==='en'?'on':'off');
+    say(m==='zh'?'中文模式：打 a b c 變成注音符號':'英文模式：打 a b c 還是英文字母');
+  }
+  mZh.addEventListener('click',function(){setMode('zh')});
+  mEn.addEventListener('click',function(){setMode('en')});
+
+
+
+  /* rules quiz */
+  var R=[
+    {q:'手先洗乾淨，再來打字。',a:true,e:'對！乾淨的手，鍵盤才不會髒。'},
+    {q:'電腦很慢，用力拍鍵盤讓它快一點。',a:false,e:'不可以！拍會把鍵盤弄壞，電腦也不會變快。輕輕按就好。'},
+    {q:'一邊吃餅乾，一邊打字。',a:false,e:'不可以！碎屑會掉進鍵盤縫裡，按鍵會卡住。'},
+    {q:'一個鍵按著不放。',a:false,e:'不可以！按著不放，字會一直跑出來。按一下，放開。'}
+  ];
+  var ri=0,rok=0,rdone=false;
+  var rtext=document.getElementById('rtext'),rfb=document.getElementById('rfb'),rscore=document.getElementById('rscore'),
+      rnext=document.getElementById('rnext'),rYes=document.getElementById('rYes'),rNo=document.getElementById('rNo');
+  function loadR(){
+    var d=R[ri]; rdone=false; rtext.textContent=(ri+1)+'. '+d.q; rfb.textContent='';
+    rYes.className='opt'; rNo.className='opt'; rnext.disabled=true;
+    rnext.textContent=ri===R.length-1?'再玩一次 ↺':'下一題 ▶';
+    rscore.textContent='第 '+(ri+1)+' / '+R.length+' 題　答對 '+rok+' 題';
+  }
+  function ansR(v,btn){
+    if(rdone)return; var d=R[ri];
+    if(v===d.a){rdone=true;rok++;btn.className='opt ok';rfb.textContent=d.e;rnext.disabled=false;say(d.e);
+      rscore.textContent='第 '+(ri+1)+' / '+R.length+' 題　答對 '+rok+' 題'}
+    else{btn.className='opt no';rfb.textContent='再想想看。';say('再想想看')}
+  }
+  rYes.addEventListener('click',function(){ansR(true,rYes)});
+  rNo.addEventListener('click',function(){ansR(false,rNo)});
+  rnext.addEventListener('click',function(){if(ri===R.length-1){ri=0;rok=0}else ri++;loadR()});
+  loadR();
+
+  /* finger tabs */
+  var FMAP={a:'f1',s:'f2',d:'f3',f:'f4',g:'f4',h:'f4',j:'f4',k:'f3',l:'f2',';':'f1'};
+  var FTXT={
+    L:'左手：小指放 a、無名指放 s、中指放 d、食指放 f（g 也是食指管）。',
+    R:'右手：食指放 j（h 也是食指管）、中指放 k、無名指放 l、小指放 ;。',
+    H:'F 和 J 上面有一條小突起。眼睛看螢幕，手指摸到突起，就知道食指回家了。大拇指放空白鍵。'
+  };
+  var hks=[].slice.call(document.querySelectorAll('.hk')),ftabs=[].slice.call(document.querySelectorAll('.ftab'));
+  var fexp=document.getElementById('fexplain');
+  function setF(m){
+    ftabs.forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-f')===m)});
+    hks.forEach(function(h){
+      var k=h.getAttribute('data-key'); h.className='hk'+(h.classList.contains('bump')?' bump':'');
+      var left='asdfg'.indexOf(k)>=0, right='hjkl;'.indexOf(k)>=0;
+      if(m==='L'&&left)h.classList.add(FMAP[k]);
+      if(m==='R'&&right)h.classList.add(FMAP[k]);
+      if(m==='H'&&(k==='f'||k==='j'))h.classList.add('hl');
+    });
+    fexp.innerHTML='<span>'+FTXT[m]+'</span>'; say(FTXT[m]);
+  }
+  ftabs.forEach(function(b){b.addEventListener('click',function(){setF(b.getAttribute('data-f'))})});
+
+
+  /* number row symbols */
+  var NUMS=[['1','!','驚嘆號，表示很驚訝或很大聲'],['2','@','「小老鼠」，電子郵件帳號中間就是它'],['3','#','井字號'],['4','$','錢的符號'],['5','%','百分比'],['6','^','次方符號，很少用'],['7','&','「和」的意思'],['8','*','星號，密碼常用'],['9','(','左括號'],['0',')','右括號']];
+  var numrow=document.getElementById('numrow'),symBtn=document.getElementById('symBtn'),symexp=document.getElementById('symexp');
+  var symOn=false,nkEls=[];
+  NUMS.forEach(function(d,i){
+    var b=document.createElement('button');b.type='button';b.className='nk';
+    b.addEventListener('click',function(){
+      nkEls.forEach(function(x){x.classList.remove('pick')});b.classList.add('pick');
+      var t=symOn?('Shift＋'+d[0]+' ＝ '+d[1]+'　'+d[2]):('數字 '+d[0]+'　按住 Shift 再按，會變 '+d[1]);
+      symexp.innerHTML='<span>'+t+'</span>';say(t);
+    });
+    numrow.appendChild(b);nkEls.push(b);
+  });
+  function renderSym(){
+    nkEls.forEach(function(b,i){b.textContent=symOn?NUMS[i][1]:NUMS[i][0]});
+    numrow.classList.toggle('sym',symOn);
+    symBtn.setAttribute('aria-pressed',symOn);
+    symBtn.textContent=symOn?'放開 Shift：看數字':'按住 Shift：看符號';
+  }
+  symBtn.addEventListener('click',function(){symOn=!symOn;renderSym();say(symOn?'現在是符號':'現在是數字')});
+  renderSym();
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Shift'&&slides[cur].contains(numrow)&&!symOn&&!e.repeat){symOn=true;renderSym()}
+  });
+  document.addEventListener('keyup',function(e){
+    if(e.key==='Shift'&&slides[cur].contains(numrow)&&symOn){symOn=false;renderSym()}
+  });
+
+  /* ctrl combo practice */
+  var WORD='我愛電腦課';
+  var docword=document.getElementById('docword'),docbox=document.getElementById('docbox'),cexp=document.getElementById('cexp');
+  var doc,hist,sel,clip,cdone;
+  function cmark(k){cdone[k]=true;[].forEach.call(document.querySelectorAll('.cs'),function(e){e.classList.toggle('done',!!cdone[e.getAttribute('data-cs')])})}
+  function crender(){docword.textContent=doc;docword.classList.toggle('sel',sel)}
+  function cmsg(t){cexp.innerHTML='<span>'+t+'</span>';say(t)}
+  function creset(){doc=WORD;hist=[];sel=false;clip='';cdone={};crender();cmark('none');cmsg('先雙擊上面的字，把它選起來。')}
+  function doCopy(){if(!sel){cmsg('還沒選起來喔！先雙擊文字。');return}clip=doc;cmark('copy');cmsg('複製好了，字被記在「剪貼簿」裡。接著點一下空白處。')}
+  function doPaste(){if(!clip){cmsg('還沒複製，沒有東西可以貼。');return}
+    if(sel){cmsg('字還是選起來的，貼上會蓋掉它。先點一下空白處。');return}
+    hist.push(doc);doc=doc+clip;crender();cmark('paste');cmsg('貼上了！同一句話出現第二次。')}
+  function doUndo(){if(!hist.length){cmsg('沒有可以復原的動作。');return}doc=hist.pop();crender();cmark('undo');cmsg('復原了，回到上一步。')}
+  docword.addEventListener('dblclick',function(){sel=true;crender();cmark('sel');cmsg('選起來了（藍底）。按 Ctrl＋C 複製。')});
+  docbox.addEventListener('click',function(e){if(e.target===docword&&e.detail>1)return;if(e.target!==docword||!sel){}
+    if(e.target!==docword&&sel){sel=false;crender();cmark('blank');cmsg('游標回到最後面。按 Ctrl＋V 貼上。')}});
+  document.getElementById('bCopy').addEventListener('click',doCopy);
+  document.getElementById('bPaste').addEventListener('click',doPaste);
+  document.getElementById('bUndo').addEventListener('click',doUndo);
+  document.getElementById('bReset').addEventListener('click',creset);
+  creset();
+  document.addEventListener('keydown',function(e){
+    if(!slides[cur].contains(docbox))return;
+    if(!(e.ctrlKey||e.metaKey))return;
+    var k=e.key.toLowerCase();
+    if(k==='c'){e.preventDefault();doCopy()}
+    else if(k==='v'){e.preventDefault();doPaste()}
+    else if(k==='z'){e.preventDefault();doUndo()}
+  });
+
+  /* fake login */
+  var fUser=document.getElementById('fUser'),fPass=document.getElementById('fPass'),fres=document.getElementById('fres'),fform=document.getElementById('fform');
+  var fShow=document.getElementById('fShow'),ft0=0;
+  function fmsg(t,ok){fres.innerHTML='<span>'+t+'</span>';fres.style.borderColor=ok?'var(--good)':'';say(t)}
+  [fUser,fPass].forEach(function(i){i.addEventListener('focus',function(){if(!ft0)ft0=Date.now()})});
+  fShow.addEventListener('click',function(){var on=fPass.type==='password';fPass.type=on?'text':'password';fShow.setAttribute('aria-pressed',on);fShow.textContent=on?'隱藏密碼':'顯示密碼'});
+  fform.addEventListener('submit',function(e){
+    e.preventDefault();
+    var u=fUser.value,pw=fPass.value;
+    if(u==='Amy05@sch'&&pw==='cat123'){
+      var sec=ft0?Math.round((Date.now()-ft0)/1000):0;
+      fmsg('登入成功！用了 '+sec+' 秒。再玩一次可以挑戰更快。',true);
+      fUser.value='';fPass.value='';ft0=0;
+    }else if(u!=='Amy05@sch'){
+      if(u.toLowerCase()==='amy05@sch')fmsg('帳號大小寫不對。A 要大寫（Shift＋a）。',false);
+      else if(u.indexOf('@')<0)fmsg('帳號少了 @。按住 Shift 再按 2。',false);
+      else fmsg('帳號有地方打錯，再對照一次。看右下角是不是英文模式。',false);
+    }else fmsg('密碼不對，點「顯示密碼」看看打了什麼。',false);
+  });
+  /* page 3 quiz */
+  var Q=[
+    {q:'想打一個大寫的 A，要怎麼按？',o:['按住 Shift，再按 a','按 Enter，再按 a','按倒退，再按 a'],a:0,e:'對！Shift 要按住，再按字母，只會變一個大寫。'},
+    {q:'想一直打大寫 ABC，要按哪個鍵？',o:['Enter','Caps Lock','空白'],a:1,e:'對！Caps Lock 按一下，後面都是大寫，燈會亮。'},
+    {q:'大寫打完了，想回到小寫，怎麼辦？',o:['再按一次 Caps Lock','按 Enter','關電腦重開'],a:0,e:'對！再按一次 Caps Lock，燈熄掉就回小寫。'}
+  ];
+  var qi=0,qok=0,qdone=false;
+  var qtext=document.getElementById('qtext'),opts=document.getElementById('opts'),qfb=document.getElementById('qfb'),
+      qscore=document.getElementById('qscore'),qnext=document.getElementById('qnext');
+  function loadQ(){
+    var d=Q[qi]; qdone=false;
+    qtext.textContent=(qi+1)+'. '+d.q; qfb.textContent=''; opts.innerHTML='';
+    qnext.disabled=true; qnext.textContent=qi===Q.length-1?'再玩一次 ↺':'下一題 ▶';
+    d.o.forEach(function(t,i){
+      var b=document.createElement('button'); b.type='button'; b.className='opt'; b.textContent=t;
+      b.addEventListener('click',function(){
+        if(qdone)return;
+        if(i===d.a){qdone=true;qok++;b.classList.add('ok');qfb.textContent=d.e;qnext.disabled=false;say(d.e);qscore.textContent='第 '+(qi+1)+' / '+Q.length+' 題　答對 '+qok+' 題'}
+        else{b.classList.add('no');qfb.textContent='再想想看，還有別的選擇。';say('再想想看')}
+      });
+      opts.appendChild(b);
+    });
+    qscore.textContent='第 '+(qi+1)+' / '+Q.length+' 題　答對 '+qok+' 題';
+  }
+  qnext.addEventListener('click',function(){
+    if(qi===Q.length-1){qi=0;qok=0}else qi++;
+    loadQ();
+  });
+  loadQ();
+
+  /* page 5 stepper */
+  var stepEls=[].slice.call(document.querySelectorAll('.step')),si=0;
+  var stPrev=document.getElementById('stPrev'),stNext=document.getElementById('stNext');
+  function setStep(n){
+    si=Math.max(0,Math.min(stepEls.length-1,n));
+    stepEls.forEach(function(e,i){e.classList.toggle('now',i===si);e.classList.toggle('dim',i>si)});
+    stPrev.disabled=si===0; stNext.disabled=si===stepEls.length-1;
+    stPrev.style.opacity=stPrev.disabled?.35:1; stNext.style.opacity=stNext.disabled?.35:1;
+    say('第 '+(si+1)+' 步：'+stepEls[si].querySelector('.stext').textContent);
+  }
+  stPrev.addEventListener('click',function(){setStep(si-1)});
+  stNext.addEventListener('click',function(){setStep(si+1)});
+  setStep(0);
+
+  /* page 6 reveal */
+  document.querySelectorAll('.card3').forEach(function(c){
+    c.addEventListener('click',function(){
+      var on=c.getAttribute('aria-expanded')==='true';
+      c.setAttribute('aria-expanded',!on);
+      if(!on)say(c.querySelector('.detail').textContent);
+    });
+  });
+
+  document.getElementById('openSite').addEventListener('click',function(){window.open('https://aaronchien-galaxy.github.io/shift-symbol-game/','_blank','noopener')});
+  /* page 4 keyboard */
+  var LAYOUT=[
+    ['1','2','3','4','5','6','7','8','9','0',{k:'Backspace',l:'← 倒退',c:'fn w3'}],
+    ['q','w','e','r','t','y','u','i','o','p'],
+    [{k:'CapsLock',l:'Caps Lock',c:'fn w3'},'a','s','d','f','g','h','j','k','l',{k:'Enter',l:'Enter',c:'fn w3'}],
+    [{k:'Shift',l:'Shift',c:'fn w3'},'z','x','c','v','b','n','m'],
+    [{k:' ',l:'空白',c:'sp'}]
+  ];
+  var INFO={
+    'Shift':['Shift','按住它，再按字母，就變大寫。例：Shift + a = A'],
+    'CapsLock':['Caps Lock','按一下，之後全部變大寫；再按一下才關掉。燈亮＝開著'],
+    'Enter':['Enter','確定，或換到下一行。打完帳號、密碼都按它'],
+    'Backspace':['倒退','刪掉游標前面那一個字'],
+    ' ':['空白','打出一個空格，字和字中間用']
+  };
+  var kb=document.getElementById('kb'), exp=document.getElementById('explain');
+  var typedEl=document.getElementById('typed'), text='', caps=false, shiftDown=false;
+  var keyEls={};
+  LAYOUT.forEach(function(r){
+    var row=document.createElement('div'); row.className='row';
+    r.forEach(function(d){
+      var o=typeof d==='string'?{k:d,l:d,c:''}:d;
+      var b=document.createElement('button'); b.type='button';
+      b.className='k '+o.c; b.textContent=o.l; b.setAttribute('data-k',o.k);
+      b.addEventListener('click',function(){press(o.k,true)});
+      row.appendChild(b); keyEls[o.k]=b;
+    });
+    kb.appendChild(row);
+  });
+  function flash(k){
+    var el=keyEls[k]; if(!el)return; el.classList.add('hit');
+    setTimeout(function(){el.classList.remove('hit')},220);
+  }
+  function show(k){
+    var i=INFO[k];
+    exp.innerHTML=i?'<span class="name">'+i[0]+'</span><span>'+i[1]+'</span>':'<span class="name">'+k.toUpperCase()+'</span><span>這是字母鍵，Shift 或 Caps Lock 開著就會變大寫。</span>';
+    if(i)say(i[0]+'：'+i[1]);
+  }
+  function render(){typedEl.textContent=text}
+  document.getElementById('clearTxt').addEventListener('click',function(){text='';render()});
+  function press(k,fromClick){
+    flash(k); show(k);
+    if(k==='Backspace')text=text.slice(0,-1);
+    else if(k==='Enter')text+='↵';
+    else if(k==='CapsLock'){caps=!caps; keyEls.CapsLock.style.outline=caps?'4px solid var(--accent)':''}
+    else if(k==='Shift'){ if(fromClick)shiftDown=true }
+    else if(k===' ')text+=' ';
+    else if(/^[a-z0-9]$/.test(k)){
+      var up=caps!==(shiftDown||(!fromClick&&window._shift));
+      text+=(/[a-z]/.test(k)&&up)?k.toUpperCase():k;
+      if(fromClick)shiftDown=false;
+    }
+    render();
+  }
+  window._shift=false;
+
+  document.addEventListener('keydown',function(e){
+    var onKB=!!slides[cur].querySelector('#kb');
+    if(onKB){
+      if(e.key==='Shift'){window._shift=true;press('Shift');return}
+      if(e.key==='CapsLock'){press('CapsLock');return}
+      if(e.key==='Enter'||e.key==='Backspace'||e.key===' '){e.preventDefault();press(e.key);return}
+      if(/^[a-zA-Z0-9]$/.test(e.key)&&!e.ctrlKey&&!e.metaKey){press(e.key.toLowerCase());return}
+    }
+    var t=e.target.tagName;
+    if(t==='BUTTON'||t==='INPUT'||t==='TEXTAREA')return;
+    var k=e.key;
+    if(k==='ArrowRight'||k==='PageDown'||(k===' '&&!onKB)){e.preventDefault();go(cur+1)}
+    else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();go(cur-1)}
+    else if(k==='Home')go(0); else if(k==='End')go(total-1);
+    else if(k==='f'||k==='F'){if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}
+    else if(k==='n'||k==='N')notesEl.classList.toggle('show');
+  });
+  document.addEventListener('keyup',function(e){if(e.key==='Shift')window._shift=false});
+  /* Arrow keys must work even when a button has focus on slide 1-2 */
+  document.addEventListener('keydown',function(e){
+    if(e.target.tagName==='BUTTON'&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){
+      e.preventDefault(); go(cur+(e.key==='ArrowRight'?1:-1));
+    }
+  },true);
+
+  window.addEventListener('hashchange',function(){var x=parseInt(location.hash.slice(1),10);if(x>=1&&x<=total&&x-1!==cur)go(x-1)});
+  var h=parseInt(location.hash.slice(1),10);
+  go(h>=1&&h<=total?h-1:0);
+  setMode('en'); // initial: nothing pre-judged
+  mZh.setAttribute('aria-pressed','false'); mEn.setAttribute('aria-pressed','false');
+  pZh.className='panel'; pEn.className='panel';
+})();
+</script>
+</body>
+</html>
