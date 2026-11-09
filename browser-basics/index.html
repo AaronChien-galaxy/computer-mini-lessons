@@ -204,9 +204,32 @@ p,.body{font-size:var(--t-body);line-height:1.5}
 .up{padding:.05em .15em;border-radius:8px;transition:background .3s}
 .up.hl{background:var(--accent);color:#fff}
 .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:min(980px,100%)}
+.lgf{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.lgf label{display:flex;gap:10px;align-items:center;font-size:var(--t-body);font-weight:800}
+.lgf input{font:inherit;font-weight:700;border:4px solid var(--line);border-radius:14px;padding:.2em .5em;background:#fff;color:var(--ink);min-width:0}
+.lgf input:focus{border-color:var(--primary);outline:none}
+.lgmsg{font-size:var(--t-caption);color:var(--accent);min-height:1.4em}
+.rlist{display:flex;flex-direction:column;gap:8px;width:100%}
+.res{display:block;text-align:left;border:4px solid var(--line);background:#fff;border-radius:16px;padding:.35em .8em;font-size:var(--t-caption);font-weight:800;color:var(--ink)}
+.res small{display:inline-block;margin-left:.6em;color:#2B7A3E;font-size:.85em}
+.res .ad{background:var(--accent);color:#fff;border-radius:6px;padding:0 .4em;margin-right:.4em;font-size:.85em}
+.res.ok{border-color:var(--good);background:var(--good-soft)}
+.res.no{border-color:var(--accent);background:var(--accent-soft)}
+.slide>*{flex-shrink:0}
+.ybox{width:min(900px,100%);font:inherit;font-weight:800;font-size:calc(var(--t-body)*1.1);border:5px solid var(--line);border-radius:22px;padding:.3em .8em;background:#fff;color:var(--ink)}
+.ybox:focus{border-color:var(--primary);outline:none}
+.yc{color:var(--muted);border-radius:6px;padding:0 .02em}
+.yc.ok{color:var(--good)}
+.yc.bad{background:var(--accent);color:#fff}
 @media (max-height:780px){
   .slide[data-pg="brw"] .kicker{display:none}
   .bpage{min-height:90px}
+  .slide[aria-label="登入口訣"] .step{padding:.05em .7em;font-size:calc(var(--t-body)*.9)}
+  .slide[aria-label="登入口訣"] .steps{gap:4px}
+  .slide[aria-label="挑可靠的結果"] .res{padding:.15em .8em}
+  .slide[aria-label="複製貼上網址"] .tip{padding:.1em 1em;font-size:var(--t-caption)}
+  .slide[aria-label="複製貼上網址"] .quizbox{padding:10px 16px}
+  .slide[aria-label="複製貼上網址"] .opt{padding:.2em .8em}
 }
 </style>
 </head>
@@ -216,12 +239,55 @@ p,.body{font-size:var(--t-body);line-height:1.5}
 <main id="deck">
 <section class="slide cover active" data-slide="1" data-section="引起動機" data-interaction="none" aria-label="封面">
   <p class="kicker">電腦小知識</p>
-  <h1>網址列和搜尋框<br>差在哪？</h1>
-  <div class="motif" aria-hidden="true"><span class="cap">www</span><span class="cap hot">.com</span><span class="cap">🔍</span></div>
-  <p class="caption">今天學：瀏覽器怎麼用，上網不迷路</p>
+  <h1>瀏覽器小達人</h1>
+  <div class="motif" aria-hidden="true"><span class="cap">www</span><span class="cap hot">.com</span><span class="cap">🔍</span><span class="cap">登入</span></div>
+  <p class="caption">今天學：瀏覽器是什麼、怎麼上網、搜尋資料、登入帳號</p>
   <button class="startbtn" type="button" data-go="2">開始 ▶</button>
 </section>
-<section class="slide" data-slide="2" data-section="維持注意" data-interaction="hotspot" aria-label="認識瀏覽器" data-pg="brw">
+<section class="slide" data-slide="2" data-section="引起動機" data-interaction="quiz" aria-label="上週回顧" data-pg="brw">
+  <p class="kicker">上週學的，還記得嗎？</p>
+  <h2>上網前的四個小動作</h2>
+  <div class="quizbox">
+    <p class="qtext" id="rtext"></p>
+    <div class="opts" id="ropts"></div>
+    <div class="feedback" id="rfb" aria-live="polite"></div>
+    <div class="qctl"><span class="caption" id="rscore"></span><button type="button" class="mini" id="rnext">下一題 ▶</button></div>
+  </div>
+  <div class="static-only qstatic"><p>右下角顯示「中」要按一下 Shift 切成「A」。一個大寫字母按住 Shift。Tab 跳到下一欄。Enter 是確定。</p></div>
+</section>
+<section class="slide" data-slide="3" data-section="引起動機" data-interaction="reveal" aria-label="瀏覽器是什麼" data-pg="brw">
+  <p class="kicker">先搞清楚</p>
+  <h2>瀏覽器是什麼？</h2>
+  <div class="three">
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">🚌 瀏覽器：帶你上網的車</span><span class="detail">是一個程式，雙擊圖示就會打開。有它，才能上網。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">📍 網站：要去的地方</span><span class="detail">Google、Classroom、均一，都是網站。瀏覽器帶你去。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">🏠 網址：地址</span><span class="detail">要告訴瀏覽器地址，它才知道要去哪裡。</span></button>
+  </div>
+  <p class="caption">點一張卡，看它的重點</p>
+</section>
+<section class="slide" data-slide="4" data-section="引起動機" data-interaction="reveal" aria-label="瀏覽器比一比" data-pg="brw">
+  <p class="kicker">名字不同，用法差不多</p>
+  <h2>瀏覽器不只一種</h2>
+  <div class="three">
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">Chrome</span><span class="detail">Google 做的。電腦、平板、手機都有，很多人在用。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">Edge</span><span class="detail">微軟做的。Windows 電腦裡本來就有。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">Firefox</span><span class="detail">Mozilla 這個非營利組織做的。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">Safari</span><span class="detail">蘋果做的。iPhone、iPad、Mac 用的。</span></button>
+  </div>
+  <p class="caption">都有分頁、網址列、← 和 ⟳，會一個就會全部。找找看，教室電腦的工作列上是哪一個？</p>
+</section>
+<section class="slide" data-slide="5" data-section="引起動機" data-interaction="quiz" aria-label="分清瀏覽器和網站" data-pg="brw">
+  <p class="kicker">車子和目的地</p>
+  <h2>是瀏覽器，還是網站？</h2>
+  <div class="quizbox">
+    <p class="qtext" id="btext"></p>
+    <div class="opts" id="bopts"></div>
+    <div class="feedback" id="bfb" aria-live="polite"></div>
+    <div class="qctl"><span class="caption" id="bscore"></span><button type="button" class="mini" id="bnext">下一題 ▶</button></div>
+  </div>
+  <div class="static-only qstatic"><p>Chrome、Edge 是瀏覽器（車子）。Google、Classroom 是網站（目的地）。用不同的瀏覽器，打同一個網址，會到同一個網站。</p></div>
+</section>
+<section class="slide" data-slide="6" data-section="維持注意" data-interaction="hotspot" aria-label="認識瀏覽器" data-pg="brw">
   <p class="kicker">先認識瀏覽器</p>
   <h2>點點看，每個地方叫什麼</h2>
   <div class="bwin" id="bw2">
@@ -237,7 +303,7 @@ p,.body{font-size:var(--t-body);line-height:1.5}
   <div class="explain" id="bexp" aria-live="polite"><span>點上面的任何一個地方。</span></div>
   <div class="static-only qstatic"><p>分頁：同時開很多個網頁。← 上一頁。⟳ 重新整理。網址列：打網站的名字。搜尋框：不知道網址時找答案。</p></div>
 </section>
-<section class="slide" data-slide="3" data-section="維持注意" data-interaction="quiz" aria-label="網址或搜尋" data-pg="brw">
+<section class="slide" data-slide="7" data-section="維持注意" data-interaction="quiz" aria-label="網址或搜尋" data-pg="brw">
   <p class="kicker">兩個地方，用法不一樣</p>
   <h2>要打網址，還是要搜尋？</h2>
   <div class="quizbox">
@@ -248,7 +314,7 @@ p,.body{font-size:var(--t-body);line-height:1.5}
   </div>
   <div class="static-only qstatic"><p>知道網站名字（例如 classroom.google.com）：直接打網址。不知道網址、想找答案（例如怎麼折紙飛機）：用搜尋。</p></div>
 </section>
-<section class="slide" data-slide="4" data-section="維持注意" data-interaction="stepper" aria-label="網址三段" data-pg="brw">
+<section class="slide" data-slide="8" data-section="維持注意" data-interaction="stepper" aria-label="網址三段" data-pg="brw">
   <p class="kicker">網址其實是一個地址</p>
   <h2>網址可以拆成三段</h2>
   <div class="urlparts" id="urlparts" aria-label="網址 https://www.google.com/search">
@@ -258,7 +324,28 @@ p,.body{font-size:var(--t-body);line-height:1.5}
   <div class="explain" id="uexp" aria-live="polite"><span>按「下一段」，一段一段看。</span></div>
   <div class="static-only qstatic"><p>https:// 是安全連線的開頭。www.google.com 是網站的名字，要看這一段。/search 是網站裡的某一頁。</p></div>
 </section>
-<section class="slide" data-slide="5" data-section="維持注意" data-interaction="tabs" aria-label="分頁" data-pg="brw">
+<section class="slide" data-slide="9" data-section="維持注意" data-interaction="practice" aria-label="打網址練習" data-pg="brw">
+  <p class="kicker">先切英文，再打網址</p>
+  <h2>照著打，一個字都不能錯</h2>
+  <div class="urlparts" id="yTarget" aria-label="要打的網址"></div>
+  <input class="ybox" id="yIn" type="text" aria-label="在這裡打網址" placeholder="在這裡打，打完會自動檢查" autocomplete="off" autocapitalize="off" spellcheck="false">
+  <div class="explain" id="yExp" aria-live="polite"><span>右下角看到「A」才是英文。</span></div>
+  <div class="switch"><button type="button" class="mini" id="yNext">換一個 ▶</button></div>
+  <div class="static-only qstatic"><p>網址要在英文模式打，不能有空白，小數點「.」不能漏。打錯一個字就會去別的地方。</p></div>
+</section>
+<section class="slide" data-slide="10" data-section="維持注意" data-interaction="quiz" aria-label="複製貼上網址" data-pg="brw">
+  <p class="kicker">不想自己打？用複製貼上</p>
+  <h2>老師傳來的網址，這樣用</h2>
+  <div class="tip" style="text-align:center">老師的訊息：<b>classroom.google.com</b></div>
+  <div class="quizbox">
+    <p class="qtext" id="mtext"></p>
+    <div class="opts" id="mopts"></div>
+    <div class="feedback" id="mfb" aria-live="polite"></div>
+    <div class="qctl"><span class="caption" id="mscore"></span><button type="button" class="mini" id="mnext">下一題 ▶</button></div>
+  </div>
+  <div class="static-only qstatic"><p>先把網址選起來，按 Ctrl＋C 複製。點網址列，按 Ctrl＋V 貼上，再按 Enter 出發。</p></div>
+</section>
+<section class="slide" data-slide="11" data-section="維持注意" data-interaction="tabs" aria-label="分頁" data-pg="brw">
   <p class="kicker">一次開好幾個網頁</p>
   <h2>分頁：開、切換、關</h2>
   <div class="chips" id="tchips">
@@ -274,7 +361,7 @@ p,.body{font-size:var(--t-body);line-height:1.5}
   <div class="switch"><button type="button" class="mini" id="tReset">重來</button></div>
   <div class="static-only qstatic"><p>＋ 開新分頁，點分頁名字切換，× 關掉分頁。至少留一個分頁。</p></div>
 </section>
-<section class="slide" data-slide="6" data-section="維持注意" data-interaction="quiz" aria-label="按哪個鍵來救" data-pg="brw">
+<section class="slide" data-slide="12" data-section="維持注意" data-interaction="quiz" aria-label="按哪個鍵來救" data-pg="brw">
   <p class="kicker">遇到狀況怎麼辦</p>
   <h2>按哪一個鍵來救？</h2>
   <div class="quizbox">
@@ -285,7 +372,7 @@ p,.body{font-size:var(--t-body);line-height:1.5}
   </div>
   <div class="static-only qstatic"><p>點錯連結：按 ← 上一頁。畫面卡住：按 ⟳ 重新整理。分頁不用了：按 × 關掉。</p></div>
 </section>
-<section class="slide" data-slide="7" data-section="喚起行動" data-interaction="quiz" aria-label="假瀏覽器練習" data-pg="brw">
+<section class="slide" data-slide="13" data-section="喚起行動" data-interaction="quiz" aria-label="假瀏覽器練習" data-pg="brw">
   <p class="kicker">假的瀏覽器，放心玩</p>
   <h2>自己上網走一圈</h2>
   <div class="chips">
@@ -305,16 +392,59 @@ p,.body{font-size:var(--t-body);line-height:1.5}
   </div>
   <div class="static-only qstatic"><p>網址列打 classroom.google.com 按 Enter，再按 ← 回上一頁；在搜尋框打「紙飛機」；按 ⟳ 重新整理。</p></div>
 </section>
-<section class="slide" data-slide="8" data-section="喚起行動" data-interaction="reveal" aria-label="今天記住四件事" data-pg="brw">
+<section class="slide" data-slide="14" data-section="喚起行動" data-interaction="stepper" aria-label="關鍵字三步" data-pg="brw">
+  <p class="kicker">用瀏覽器找資料</p>
+  <h2>搜尋前先想：關鍵字</h2>
+  <ol class="steps">
+    <li class="step"><span class="num">1</span><span class="stext">想清楚：我要找什麼？（台灣黑熊吃什麼）</span></li>
+    <li class="step"><span class="num">2</span><span class="stext">挑出重要的字：台灣黑熊、食物</span></li>
+    <li class="step"><span class="num">3</span><span class="stext">字中間空一格，按 Enter 搜尋</span></li>
+    <li class="step"><span class="num">4</span><span class="stext">找不到？換個字再試一次</span></li>
+  </ol>
+  <div class="switch"><button type="button" class="stprev">◀ 上一步</button><button type="button" class="stnext">下一步 ▶</button></div>
+  <div class="static-only qstatic"><p>不用打一整句。想知道台灣黑熊吃什麼，打「台灣黑熊 食物」，字中間空一格。</p></div>
+</section>
+<section class="slide" data-slide="15" data-section="喚起行動" data-interaction="quiz" aria-label="挑可靠的結果" data-pg="brw">
+  <p class="kicker">搜尋「台灣黑熊 食物」</p>
+  <h2>哪一個最可靠？</h2>
+  <div class="chips"><span class="cs" data-t="pick">點一個最可靠的結果</span><button type="button" class="mini" id="srReset">重來 ↺</button></div>
+  <div class="bwin"><div class="bbar"><span class="pill">🔍 台灣黑熊 食物</span></div><div class="bpage" style="min-height:0;padding:8px 10px"><div class="rlist" id="srList"></div></div></div>
+  <div class="explain" id="srExp" aria-live="polite"><span>點點看，說說為什麼。</span></div>
+  <div class="static-only qstatic"><p>有「廣告」的是賣東西的。寫「我猜」的不可靠。.edu.tw（學校）和 .gov.tw（政府）的網站比較可靠。</p></div>
+</section>
+<section class="slide" data-slide="16" data-section="喚起行動" data-interaction="stepper" aria-label="登入口訣" data-pg="brw">
+  <p class="kicker">登入 Google 帳號</p>
+  <h2>登入五步口訣</h2>
+  <ol class="steps">
+    <li class="step"><span class="num">1</span><span class="stext">看右下角，確定是「A」英文</span></li>
+    <li class="step"><span class="num">2</span><span class="stext">點帳號欄，打帳號（記得 @）</span></li>
+    <li class="step"><span class="num">3</span><span class="stext">按 Tab 或點下一步，打密碼（用手擋）</span></li>
+    <li class="step"><span class="num">4</span><span class="stext">按 Enter 登入</span></li>
+    <li class="step"><span class="num">5</span><span class="stext">用完點頭像，按「登出」</span></li>
+  </ol>
+  <div class="switch"><button type="button" class="stprev">◀ 上一步</button><button type="button" class="stnext">下一步 ▶</button></div>
+  <div class="static-only qstatic"><p>先確認英文、打帳號（有 @）、打密碼、按 Enter、用完登出。密碼只有自己、爸媽和老師知道。</p></div>
+</section>
+<section class="slide" data-slide="17" data-section="喚起行動" data-interaction="quiz" aria-label="假登入練習" data-pg="brw">
+  <p class="kicker">假的登入畫面，放心練</p>
+  <h2>自己登入一次</h2>
+  <div class="chips"><span class="cs" data-t="user">① 打對帳號</span><span class="cs" data-t="pass">② 打對密碼</span><span class="cs" data-t="in">③ 登入成功</span><span class="cs" data-t="out">④ 點頭像登出</span><button type="button" class="mini" id="lgReset">重來 ↺</button></div>
+  <p class="caption">練習帳號 <b>stu05@school.example</b>　密碼 <b>cat123</b>（假的，只能在這裡用）</p>
+  <div class="bwin"><div class="bbar"><span class="pill">🔒 login.school.example</span></div><div class="bpage lgpage" id="lgPage"></div></div>
+  <div class="static-only qstatic"><p>帳號欄打 stu05@school.example，按下一步；密碼打 cat123，按登入。登入後點頭像，按登出。</p></div>
+</section>
+<section class="slide" data-slide="18" data-section="喚起行動" data-interaction="reveal" aria-label="今天記住六件事" data-pg="brw">
   <p class="kicker">收尾</p>
-  <h2>今天記住四件事</h2>
-  <div class="three" style="grid-template-columns:repeat(2,1fr)">
-    <button type="button" class="card3" aria-expanded="false"><span class="ct">① 打網址或搜尋</span><span class="detail">知道網站名字，就在網址列打。想找答案，就用搜尋。</span></button>
-    <button type="button" class="card3" aria-expanded="false"><span class="ct">② 看網站名字那一段</span><span class="detail">網址裡 www 到 .com 那一段是網站的名字，打錯一個字就會去別的地方。</span></button>
-    <button type="button" class="card3" aria-expanded="false"><span class="ct">③ 分頁：開、切、關</span><span class="detail">＋ 開新的，點名字切換，× 關掉不用的。</span></button>
-    <button type="button" class="card3" aria-expanded="false"><span class="ct">④ 上一頁、重新整理</span><span class="detail">點錯了按 ←，卡住了按 ⟳，不要慌。</span></button>
+  <h2>今天記住六件事</h2>
+  <div class="three">
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">① 瀏覽器是車，網站是目的地</span><span class="detail">Chrome、Edge 是瀏覽器。Google、Classroom 是網站。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">② 打網址或搜尋</span><span class="detail">知道網站名字，就在網址列打。想找答案，就用搜尋。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">③ 分頁、上一頁、重新整理</span><span class="detail">＋ 開新的，× 關掉。點錯按 ←，卡住按 ⟳。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">④ 搜尋打重要的字</span><span class="detail">不用一整句，字中間空一格。有「廣告」的先跳過。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">⑤ 看網址挑網站</span><span class="detail">.edu.tw 是學校，.gov.tw 是政府，比較可靠。打錯一個字就會去別的地方。</span></button>
+    <button type="button" class="card3" aria-expanded="false"><span class="ct">⑥ 登入要小心</span><span class="detail">先看是「A」英文，帳號有 @，密碼不給別人，用完登出。</span></button>
   </div>
-  <p class="caption">點一張卡，看它的重點</p>
+  <p class="caption">點一張卡，看它的重點。接下來：打開符號小站，練「網址」那一關。</p>
 </section>
 </main>
 <button class="navbtn" id="prev" type="button">◀ 上一頁</button>
@@ -328,7 +458,7 @@ p,.body{font-size:var(--t-body);line-height:1.5}
   var slides=[].slice.call(document.querySelectorAll('.slide')),total=slides.length,cur=0;
   var phaseEl=document.getElementById('section-tag'),pageEl=document.getElementById('page-info'),progEl=document.getElementById('progress'),liveEl=document.getElementById('live');
   var prevB=document.getElementById('prev'),nextB=document.getElementById('next'),notesEl=document.getElementById('notes');
-  var NOTES=["開場：問「想去 Classroom，要打在哪裡？」讓學生先猜。", "先不講答案，讓學生猜每個部位，再點開對答。重點是網址列和搜尋框是兩個不同的東西。", "四個例子。網址長得像「xxx.com」→直接打；一句話、有「怎麼」→用搜尋。答錯讓學生說理由。", "重點是中間那段「網站名字」。提醒：網址不能有空白，要在英文模式打（回扣上一課中英文切換）。", "請學生各自操作一次。重點：分頁不是視窗，可以同時開很多個；至少留一個。", "三個情境：點錯→←、卡住→⟳、不用了→×。學生舉手選，老師點。", "假瀏覽器，不會連網。四個任務都完成後，請學生到真的瀏覽器照做一次。", "請學生說出四件事，再點卡片對答案。下一課接 Google 登入。"];
+  var NOTES=["開場：問「想去 Classroom，要打在哪裡？」讓學生先猜。內容較多，分兩段：第 2～13 頁講瀏覽器怎麼用，第 14～17 頁是搜尋資料與登入。時間不夠就停在第 13 頁，後半留到下次。", "上週回顧，四題搶答，約 1 分鐘。重點是打網址前先看右下角是不是「A」。答不出來就翻上週簡報的中英文切換那頁。", "用交通比喻：瀏覽器是車子，網站是目的地，網址是地址。點三張卡。常見的錯：學生說「我用 Google 上網」，要改成「我用瀏覽器去 Google 這個網站」。", "點四張卡，看誰做的、哪裡用。重點不是背名字，是「長得差不多，會一個就會全部」。請學生看工作列，找出自己現在用的是哪一個。", "四題。最容易混的是 Google：它是網站，不是瀏覽器。用不同瀏覽器打同一個網址，會到同一個網站。","先不講答案，讓學生猜每個部位，再點開對答。重點是網址列和搜尋框是兩個不同的東西。", "四個例子。網址長得像「xxx.com」→直接打；一句話、有「怎麼」→用搜尋。答錯讓學生說理由。", "重點是中間那段「網站名字」。提醒：網址不能有空白，要在英文模式打（回扣上一課中英文切換）。", "請學生上台打一個。打錯的字會變橘色；變中文會提示按 Shift；字母變大寫會提示 Caps Lock。這一頁就是符號小站「網址」關的暖身，打完直接接去練。", "回扣上週 Ctrl＋C／V。先在黃色訊息上拖曳選起來，示範真的複製，再貼到上一頁的輸入框或真瀏覽器網址列。提醒：貼上之後還要按 Enter。", "請學生各自操作一次。重點：分頁不是視窗，可以同時開很多個；至少留一個。", "三個情境：點錯→←、卡住→⟳、不用了→×。學生舉手選，老師點。", "假瀏覽器，不會連網。四個任務都完成後，請學生到真的瀏覽器照做一次。", "示範：想知道台灣黑熊吃什麼，打「台灣黑熊 食物」。重點是挑重要的字、中間空一格、不用打整句。", "四個結果（網址是虛構的）：廣告、誇張標題、.edu.tw、.gov.tw。讓學生先說理由，再點。", "一步一步按。對應前面學的：右下角看「A」（按 Shift 切換）、帳號有 @（Shift＋2）、Tab 換欄位、Enter 登入、用完登出。", "練習帳號 stu05@school.example、密碼 cat123 是假的，不是學生真的帳號。真的 Google 帳號登入由老師帶全班做，密碼只有自己、爸媽和老師知道。", "請學生說出六件事，再點卡片對答案。"];
   function say(t){liveEl.textContent=t}
   function go(n){
     n=Math.max(0,Math.min(total-1,n));cur=n;
@@ -387,6 +517,23 @@ p,.body{font-size:var(--t-body);line-height:1.5}
     nx.addEventListener('click',function(){if(i===items.length-1){i=0;ok=0}else i++;load()});
     load();
   }
+  makeQuiz('r',[
+    {q:'要打網址，右下角卻顯示「中」，怎麼辦？',o:['按 Caps Lock','按一下 Shift，切成「A」','用力按 Enter'],a:1,e:'對！按一下 Shift，右下角變成「A」才是英文。'},
+    {q:'只要一個大寫的 A，怎麼打？',o:['連按兩次 a','一直按 Caps Lock','按住 Shift 再按 a'],a:2,e:'對！Shift 只管一個字。要一直大寫才用 Caps Lock。'},
+    {q:'帳號打完，想跳到密碼欄，按哪個鍵？',o:['Tab','Esc','Ctrl'],a:0,e:'對！Tab 跳到下一欄，不用拿滑鼠。'},
+    {q:'網址打完，按哪個鍵才會出發？',o:['Shift','Enter','Tab'],a:1,e:'對！Enter 是確定，網址才會送出去。'}
+  ]);
+  makeQuiz('m',[
+    {q:'想複製這個網址，要先做什麼？',o:['先按 Ctrl＋V','先按 Enter','先把網址選起來，再按 Ctrl＋C'],a:2,e:'對！先選起來，再按 Ctrl＋C 複製。'},
+    {q:'複製好了，要點哪裡再按 Ctrl＋V？',o:['網址列','重新整理 ⟳','上一頁 ←'],a:0,e:'對！點網址列，再按 Ctrl＋V 貼上。'},
+    {q:'貼上以後，還要按什麼才會去那個網站？',o:['Shift','Caps Lock','Enter'],a:2,e:'對！貼上只是把字放進去，按 Enter 才會出發。'}
+  ]);
+  makeQuiz('b',[
+    {q:'Chrome 是什麼？',o:['網站，要去的地方','瀏覽器，上網用的工具'],a:1,e:'對！Chrome 是瀏覽器，像一台車。'},
+    {q:'Google（google.com）是什麼？',o:['網站，也是搜尋的地方','瀏覽器'],a:0,e:'對！Google 是網站，要用瀏覽器才打得開。'},
+    {q:'Edge 和 Chrome 差在哪？',o:['都是瀏覽器，不同公司做的','一個是網站，一個是瀏覽器','Edge 不能上網'],a:0,e:'對！都是瀏覽器，用法差不多。'},
+    {q:'用 Edge 或 Chrome 打 classroom.google.com，會到哪裡？',o:['不一樣的地方','同一個網站'],a:1,e:'對！網址一樣，就到同一個網站，不管用哪個瀏覽器。'}
+  ]);
   var A2=['我知道網站名字，直接打網址','我想找答案，用搜尋'];
   makeQuiz('a',[
     {q:'想去 classroom.google.com',o:A2,a:0,e:'對！知道網站名字，就直接在網址列打。'},
@@ -409,7 +556,26 @@ p,.body{font-size:var(--t-body);line-height:1.5}
   document.getElementById('uPrev').addEventListener('click',function(){setU(ui-1)});
   document.getElementById('uNext').addEventListener('click',function(){setU(ui+1)});
 
-  /* page 5 tabs */
+  /* page 6 type a url */
+  var YT=['www.google.com','classroom.google.com','www.moe.edu.tw'],yi=0;
+  var yTarget=document.getElementById('yTarget'),yIn=document.getElementById('yIn'),yExp=document.getElementById('yExp');
+  function ymsg(t){yExp.innerHTML='<span>'+t+'</span>';say(t)}
+  function yrender(){
+    var v=yIn.value,t=YT[yi],h='',i,bad=false;
+    for(i=0;i<t.length;i++){var cls='yc';if(i<v.length){var okc=v.charAt(i)===t.charAt(i);cls+=okc?' ok':' bad';if(!okc)bad=true}h+='<span class="'+cls+'">'+t.charAt(i)+'</span>'}
+    if(v.length>t.length)bad=true;
+    yTarget.innerHTML=h;
+    if(v===t)ymsg('打對了！網址一個字都沒錯。按「換一個」再練。');
+    else if(/[^\x00-\x7F]/.test(v))ymsg('好像是中文模式，按一下 Shift 切成「A」，再重打。');
+    else if(bad&&v.toLowerCase()===t.slice(0,v.length))ymsg('字母變大寫了，檢查 Caps Lock 有沒有開著。');
+    else if(bad)ymsg('橘色的字不一樣，按 Backspace 刪掉再打。');
+    else ymsg('右下角看到「A」才是英文。');
+  }
+  yIn.addEventListener('input',yrender);
+  document.getElementById('yNext').addEventListener('click',function(){yi=(yi+1)%YT.length;yIn.value='';yrender();yIn.focus()});
+  yrender();
+
+  /* page 8 tabs */
   var tabs=[{id:1,t:'Google 首頁'}],tact=1,tn=1,tdone={};
   var tstrip=document.getElementById('tstrip'),tbody=document.getElementById('tbody'),texp=document.getElementById('texp');
   function tmark(k){tdone[k]=true;[].forEach.call(document.querySelectorAll('[data-tc]'),function(e){e.classList.toggle('done',!!tdone[e.getAttribute('data-tc')])})}
@@ -475,7 +641,71 @@ p,.body{font-size:var(--t-body);line-height:1.5}
   pReload.addEventListener('click',function(){reloads++;pmark('reload');prender();say('重新整理了')});
   prender();
 
-  /* page 8 reveal */
+  /* steppers (keywords, login) */
+  function makeSteps(sec){
+    var st=[].slice.call(sec.querySelectorAll('.step')),pv=sec.querySelector('.stprev'),nx=sec.querySelector('.stnext'),i=0;
+    function ap(){st.forEach(function(s,j){s.classList.toggle('dim',j>i);s.classList.toggle('now',j===i)});
+      pv.style.opacity=i===0?.35:1;nx.style.opacity=i===st.length-1?.35:1}
+    pv.addEventListener('click',function(){i=Math.max(0,i-1);ap();say(st[i].textContent)});
+    nx.addEventListener('click',function(){i=Math.min(st.length-1,i+1);ap();say(st[i].textContent)});
+    ap();
+  }
+  makeSteps(document.querySelector('.slide[aria-label="關鍵字三步"]'));
+  makeSteps(document.querySelector('.slide[aria-label="登入口訣"]'));
+
+  /* search results picker */
+  (function(){
+    var sec=document.querySelector('.slide[aria-label="挑可靠的結果"]'),list=document.getElementById('srList'),exp=document.getElementById('srExp');
+    var R=[{t:'【限時特價】可愛黑熊玩偶買一送一',u:'shop.example.com/bear',ad:true,ok:false,e:'前面寫「廣告」，是賣東西的，不是我們要找的資料。'},
+      {t:'黑熊吃什麼？我猜是吃人！超可怕',u:'blog.example.net/fun123',ad:false,ok:false,e:'個人寫的文章，還寫「我猜」，標題又很誇張，不可靠。'},
+      {t:'台灣黑熊的食物－國小自然教學網',u:'nature.edu.tw/bear',ad:false,ok:true,e:'.edu.tw 是學校和教育單位的網站，可以相信！'},
+      {t:'台灣黑熊介紹｜動物保育資料',u:'animal.gov.tw/bear',ad:false,ok:true,e:'.gov.tw 是政府的網站，資料比較可靠！'}];
+    R.forEach(function(r){
+      var b=document.createElement('button');b.type='button';b.className='res';
+      b.innerHTML=(r.ad?'<span class="ad">廣告</span>':'')+esc(r.t)+'<small>'+esc(r.u)+'</small>';
+      b.addEventListener('click',function(){b.classList.add(r.ok?'ok':'no');exp.innerHTML='<span>'+esc(r.e)+'</span>';say(r.e);
+        if(r.ok)sec.querySelector('[data-t="pick"]').classList.add('done')});
+      list.appendChild(b);
+    });
+    document.getElementById('srReset').addEventListener('click',function(){
+      [].forEach.call(list.querySelectorAll('.res'),function(b){b.classList.remove('ok','no')});
+      sec.querySelector('[data-t="pick"]').classList.remove('done');exp.innerHTML='<span>點點看，說說為什麼。</span>'});
+  })();
+
+  /* fake login */
+  (function(){
+    var sec=document.querySelector('.slide[aria-label="假登入練習"]'),page=document.getElementById('lgPage'),state='user',show=false,t0=0;
+    function mark(k){var e=sec.querySelector('[data-t="'+k+'"]');if(e)e.classList.add('done')}
+    function unmark(){[].forEach.call(sec.querySelectorAll('[data-t]'),function(e){e.classList.remove('done')})}
+    function render(msg){
+      var h='';
+      if(state==='user')h='<span class="big">登入</span><form class="lgf"><label>帳號 <input class="lgi" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="帳號"></label><div class="switch"><button type="submit" class="mini">下一步</button></div></form>';
+      else if(state==='pass')h='<span class="big">歡迎，stu05</span><form class="lgf"><label>密碼 <input class="lgi" type="'+(show?'text':'password')+'" autocomplete="off" aria-label="密碼"></label><div class="switch"><button type="button" class="mini lgshow">'+(show?'隱藏密碼':'顯示密碼')+'</button><button type="submit" class="mini">登入</button></div></form>';
+      else h='<span class="big">登入成功！</span><p class="caption">'+esc(msg||'')+'</p><div class="switch"><button type="button" class="mini lgav">👤 頭像（點我看選單）</button><button type="button" class="mini lgout" hidden>登出</button></div>';
+      page.innerHTML=h+'<div class="lgmsg" aria-live="polite">'+(state!=='in'&&msg?esc(msg):'')+'</div>';
+      var inp=page.querySelector('.lgi');
+      if(inp)inp.addEventListener('focus',function(){if(!t0)t0=Date.now()});
+      var f=page.querySelector('form');
+      if(f)f.addEventListener('submit',function(e){e.preventDefault();var v=inp.value;
+        if(state==='user'){
+          if(!v.trim())return render('還沒打帳號喔。');
+          if(v.trim()==='stu05@school.example'){mark('user');state='pass';render('');say('帳號正確，換打密碼');var n=page.querySelector('.lgi');if(n)n.focus()}
+          else if(v.indexOf('@')<0)render('帳號少了 @。按住 Shift 再按 2。');
+          else render('帳號有地方打錯了，對照看看。右下角是不是英文？');
+        }else{
+          if(v==='cat123'){mark('pass');mark('in');state='in';var s2=t0?Math.round((Date.now()-t0)/1000):0;render('用了 '+s2+' 秒。用完要登出：點下面的頭像。');say('登入成功')}
+          else render('密碼不對。點「顯示密碼」看看打了什麼，檢查 Caps Lock。');
+        }
+      });
+      var sh=page.querySelector('.lgshow');if(sh)sh.addEventListener('click',function(){var v=page.querySelector('.lgi').value;show=!show;render('');var n=page.querySelector('.lgi');n.value=v;n.focus()});
+      var av=page.querySelector('.lgav');if(av)av.addEventListener('click',function(){page.querySelector('.lgout').hidden=false});
+      var lo=page.querySelector('.lgout');if(lo)lo.addEventListener('click',function(){mark('out');state='user';t0=0;show=false;render('已登出，下一個同學可以安心用了。');say('已登出')});
+    }
+    render('');
+    document.getElementById('lgReset').addEventListener('click',function(){unmark();state='user';show=false;t0=0;render('')});
+  })();
+
+  /* reveal cards */
   document.querySelectorAll('.card3').forEach(function(c){c.addEventListener('click',function(){var on=c.getAttribute('aria-expanded')==='true';c.setAttribute('aria-expanded',!on);if(!on)say(c.querySelector('.detail').textContent)})});
 
   var h=parseInt(location.hash.slice(1),10);go(h>=1&&h<=total?h-1:0);
